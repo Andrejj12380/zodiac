@@ -1,6 +1,7 @@
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import render
 import requests
+from django.urls import reverse
 
 URL = "https://horoscope-astrology.p.rapidapi.com"
 
@@ -42,6 +43,13 @@ sign_dict = {
                'https://cdn-icons-mp4.flaticon.com/512/9084/9084427.mp4'],
 }
 
+types_ = {
+    'Fire': ['Aries', 'Leo', 'Sagittarius'],
+    'Air': ['Gemini', 'Libra', 'Aquarius'],
+    'Earth': ['Taurus', 'Virgo', 'Capricorn'],
+    'Water': ['Cancer', 'Scorpio', 'Pisces']
+}
+
 
 def get_info(request, sign: str):
     for key, value in sign_dict.items():
@@ -57,6 +65,55 @@ def get_info(request, sign: str):
 def get_info_int(request, sign: int):
     signs_list = list(sign_dict)
     if sign > len(signs_list):
-        return HttpResponseNotFound(f'Нет запрашиваемого знака зодиака {sign}')
+        return HttpResponseNotFound(f'Нет знака зодиака под номером {sign}')
     sign_name = signs_list[sign - 1]
-    return HttpResponseRedirect(f'{sign_name.lower()}')
+    redirect_url = reverse('horoscope-name', args=(sign_name,))
+    return HttpResponseRedirect(redirect_url)
+
+
+def index_h(request):
+    signs_list = list(sign_dict)
+    res = ''
+    for sign in signs_list:
+        redirect_url = reverse('horoscope-name', args=(sign,))
+        res += f'<li><a href="{redirect_url}">{sign}</a></li>'
+    response = f"""
+    <ol>
+    {res}
+    </ol>
+    """
+    return HttpResponse(response)
+
+
+def get_types(request):
+    types_list = list(types_)
+    res = ''
+    for type_ in types_list:
+        res += f'<li><a href="{type_}">{type_}</a></li>'
+    response = f"""
+        <ol>
+        {res}
+        </ol>
+        """
+    return HttpResponse(response)
+
+
+def get_info_type(request, type_: str):
+    redirect_url = ''
+    for key, value in types_.items():
+        print(type_.lower(), key.lower())
+        if type_.lower() == key.lower():
+            res = ''
+            for sign in types_[key.title()]:
+                redirect_url = reverse('horoscope-name', args=(sign,))
+                print(redirect_url)
+                res += f'<li><a href="{sign}">{sign}</a></li>'
+            response = f"""
+                <ol>
+                {res}
+                </ol>
+                """
+            return HttpResponse(response)
+    else:
+        print(type_)
+        return HttpResponseRedirect(redirect_url)
