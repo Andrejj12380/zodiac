@@ -57,7 +57,7 @@ def get_info(request, sign: str):
             return render(request, 'index.html', {'info': value[0],
                                                   'name': key,
                                                   'text': response_phrase['daily'],
-                                                  'video': value[1]})
+                                                  'video': value[1]},)
     else:
         return HttpResponse(f'Нет запрашиваемого знака зодиака {sign}')
 
@@ -89,7 +89,8 @@ def get_types(request):
     types_list = list(types_)
     res = ''
     for type_ in types_list:
-        res += f'<li><a href="{type_}">{type_}</a></li>'
+        redirect = reverse('element', args=(type_,))
+        res += f'<li><a href="{redirect}">{type_}</a></li>'
     response = f"""
         <ol>
         {res}
@@ -98,22 +99,15 @@ def get_types(request):
     return HttpResponse(response)
 
 
-def get_info_type(request, type_: str):
-    redirect_url = ''
-    for key, value in types_.items():
-        print(type_.lower(), key.lower())
-        if type_.lower() == key.lower():
-            res = ''
-            for sign in types_[key.title()]:
-                redirect_url = reverse('horoscope-name', args=(sign,))
-                print(redirect_url)
-                res += f'<li><a href="{sign}">{sign}</a></li>'
-            response = f"""
-                <ol>
-                {res}
-                </ol>
-                """
-            return HttpResponse(response)
-    else:
-        print(type_)
-        return HttpResponseRedirect(redirect_url)
+def get_info_sign_element(request, element: str):
+    res = ''
+    print(request)
+    for sign in types_[element.title()]:
+        redirect = reverse('horoscope-name', args=(sign,))
+        res += f'<li><a href="{redirect}">{sign}</a></li>'
+    response = f"""
+            <ol>
+            {res}
+            </ol>
+            """
+    return HttpResponse(response)
