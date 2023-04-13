@@ -4,6 +4,7 @@ import traceback
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import render
 import requests
+from django.template.loader import render_to_string
 from django.urls import reverse
 
 # URL и заголовки для API-запросов
@@ -71,13 +72,22 @@ def get_date_converters(request, sign_dict):
 
 
 # Функция для получения информации о гороскопе на основе знака зодиака
+# def get_info(request, sign: str):
+#     for key, value in sign_dict.items():
+#         if sign.lower() == key.lower():
+#             return render(request, 'index.html', {'info': value[0],
+#                                                   'name': key,
+#                                                   'text': response_phrase['daily'],
+#                                                   'video': value[1]}, )
+#     else:
+#         return HttpResponse(f'Нет запрашиваемого знака зодиака {sign}')
+
+
 def get_info(request, sign: str):
     for key, value in sign_dict.items():
         if sign.lower() == key.lower():
-            return render(request, 'index.html', {'info': value[0],
-                                                  'name': key,
-                                                  'text': response_phrase['daily'],
-                                                  'video': value[1]}, )
+            response = render_to_string('horoscope/info_zodiac.html')
+            return HttpResponse(response)
     else:
         return HttpResponse(f'Нет запрашиваемого знака зодиака {sign}')
 
