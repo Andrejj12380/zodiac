@@ -6,8 +6,10 @@ from django.shortcuts import render
 import requests
 from django.urls import reverse
 
+# URL и заголовки для API-запросов
 URL = "https://horoscope-astrology.p.rapidapi.com"
 
+# URL и фраза для ежедневного гороскопа
 URL_HOROSCOPE = 'https://rapidapi.com/Alejandro99aru/api/horoscope-astrology'
 
 phrase = '/dailyphrase'
@@ -19,6 +21,7 @@ headers = {
 
 response_phrase = requests.request("GET", f'{URL}{phrase}', headers=headers).json()
 
+# Словарь знаков зодиака, содержащий название, описание, URL видео и даты
 sign_dict = {
     'Aries': ['Овен - первый знак зодиака, планета Марс (с 21 марта по 20 апреля)',
               'https://cdn-icons-mp4.flaticon.com/512/9084/9084119.mp4', [80, 110]],
@@ -46,6 +49,7 @@ sign_dict = {
                'https://cdn-icons-mp4.flaticon.com/512/9084/9084427.mp4', [51, 79]],
 }
 
+# Словарь элементов знаков зодиака
 types_ = {
     'Fire': ['Aries', 'Leo', 'Sagittarius'],
     'Air': ['Gemini', 'Libra', 'Aquarius'],
@@ -54,6 +58,19 @@ types_ = {
 }
 
 
+def get_yyyy_converters(request, sign_dict):
+    return HttpResponse(f'Вы передали строку из 4х цифр - {sign_dict}')
+
+
+def get_float_converters(request, sign_dict):
+    return HttpResponse(f'Вы передали вещественное число - {sign_dict}')
+
+
+def get_date_converters(request, sign_dict):
+    return HttpResponse(f'Вы передали дату - {sign_dict}')
+
+
+# Функция для получения информации о гороскопе на основе знака зодиака
 def get_info(request, sign: str):
     for key, value in sign_dict.items():
         if sign.lower() == key.lower():
@@ -65,6 +82,7 @@ def get_info(request, sign: str):
         return HttpResponse(f'Нет запрашиваемого знака зодиака {sign}')
 
 
+# Функция для получения информации о гороскопе на основе индекса знака зодиака
 def get_info_int(request, sign: int):
     signs_list = list(sign_dict)
     if sign > len(signs_list):
@@ -74,6 +92,7 @@ def get_info_int(request, sign: int):
     return HttpResponseRedirect(redirect_url)
 
 
+# Функция для отображения списка всех знаков зодиака
 def index_h(request):
     signs_list = list(sign_dict)
     res = ''
@@ -88,6 +107,7 @@ def index_h(request):
     return HttpResponse(response)
 
 
+# Функция для получения типов знаков зодиака
 def get_types(request):
     types_list = list(types_)
     res = ''
@@ -102,6 +122,7 @@ def get_types(request):
     return HttpResponse(response)
 
 
+# Функция для получения информации о гороскопе на основе стихии знака зодиака
 def get_info_sign_element(request, element: str):
     res = ''
     print(request)
@@ -116,6 +137,7 @@ def get_info_sign_element(request, element: str):
     return HttpResponse(response)
 
 
+# Функция для поиска знака зодиака на основе заданной даты
 def search_sign(request, month: int, day: int):
     try:
         datetime.date(year=datetime.date.today().year, month=month, day=day)
@@ -141,10 +163,9 @@ def search_sign(request, month: int, day: int):
             if day_number in range(value[2][0], value[2][1] + 1):
                 redirect = reverse('horoscope-name', args=(key,))
                 return HttpResponseRedirect(redirect)
-        err = 'No horoscope found for this day'
+        err = 'Не найдено знака зодиака для данного дня'
         return HttpResponse(err)
     except Exception as e:
         err = str(e)
         traceback.print_exc()
         return HttpResponse(err)
-
