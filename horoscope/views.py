@@ -1,6 +1,6 @@
 import datetime
 import traceback
-
+from .translate import translate
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import render
 import requests
@@ -41,7 +41,7 @@ sign_dict = {
     'Scorpio': ['Скорпион - восьмой знак зодиака, планета Марс (с 24 октября по 22 ноября)',
                 'https://cdn-icons-mp4.flaticon.com/512/9084/9084322.mp4', [297, 326]],
     'Sagittarius': ['Стрелец - девятый знак зодиака, планета Юпитер (с 23 ноября по 22 декабря)',
-                    'https://cdn-icons-mp4.flaticon.com/512/9084/9084322.mp4', [327, 356]],
+                    'https://cdn-icons-mp4.flaticon.com/512/9084/9084352.mp4', [327, 356]],
     'Capricorn': ['Козерог - десятый знак зодиака, планета Сатурн (с 23 декабря по 20 января)',
                   'https://cdn-icons-mp4.flaticon.com/512/9084/9084382.mp4', [357, 20]],
     'Aquarius': ['Водолей - одиннадцатый знак зодиака, планеты Уран и Сатурн (с 21 января по 19 февраля)',
@@ -72,24 +72,24 @@ def get_date_converters(request, sign_dict):
 
 
 # Функция для получения информации о гороскопе на основе знака зодиака
-# def get_info(request, sign: str):
-#     for key, value in sign_dict.items():
-#         if sign.lower() == key.lower():
-#             return render(request, 'index.html', {'info': value[0],
-#                                                   'name': key,
-#                                                   'text': response_phrase['daily'],
-#                                                   'video': value[1]}, )
-#     else:
-#         return HttpResponse(f'Нет запрашиваемого знака зодиака {sign}')
-
-
 def get_info(request, sign: str):
     for key, value in sign_dict.items():
         if sign.lower() == key.lower():
-            response = render_to_string('horoscope/info_zodiac.html')
-            return HttpResponse(response)
+            return render(request, 'index.html', {'info': value[0],
+                                                  'name': translate(key),
+                                                  'text': translate(response_phrase['daily']),
+                                                  'video': value[1]}, )
     else:
         return HttpResponse(f'Нет запрашиваемого знака зодиака {sign}')
+
+
+# def get_info(request, sign: str):
+#     for key, value in sign_dict.items():
+#         if sign.lower() == key.lower():
+#             response = render_to_string('horoscope/info_zodiac.html')
+#             return HttpResponse(response)
+#     else:
+#         return HttpResponse(f'Нет запрашиваемого знака зодиака {sign}')
 
 
 # Функция для получения информации о гороскопе на основе индекса знака зодиака
